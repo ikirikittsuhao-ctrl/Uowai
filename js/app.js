@@ -9,7 +9,11 @@ const statusText = document.getElementById('statusText');
 const textInput = document.getElementById('textInput');
 const seedInput = document.getElementById('seedInput');
 
-// 起動時に /data/gakusyuu1.json を取得して画面に初期ロード
+// 生成文章の最大文字数制限
+const MAX_CHAR_LIMIT = 100;
+
+// 起動時に /data/gakusyuu1.json を取得して学習用テキストエリアへ読み込み
+// directionは任意パラメータとして処理し、大量のinfoテキストをそのまま結合
 window.addEventListener('DOMContentLoaded', () => {
   fetch('/data/gakusyuu1.json')
     .then(response => {
@@ -18,7 +22,13 @@ window.addEventListener('DOMContentLoaded', () => {
     })
     .then(data => {
       if (Array.isArray(data)) {
-        const textLines = data.map(item => item.info).filter(Boolean);
+        // infoが存在する場合はそのまま抽出し、文字列配列として取得
+        const textLines = data.map(item => {
+          if (typeof item === 'string') return item;
+          if (item && item.info) return item.info;
+          return '';
+        }).filter(Boolean);
+        
         textInput.value = textLines.join('\n');
       }
     })
@@ -82,6 +92,30 @@ trainBtn.addEventListener('click', () => {
   });
 });
 
+// 重複文章・連続重複単語の自動削除フィルター
+function removeDuplicatePhrases(tokens) {
+  const result = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const currentToken = tokens[i];
+    // 同じ単語が連続した場合は追加せずスキップ
+    if (result.length > 0 && result[result.length - 1] === currentToken) {
+      continue;
+    }
+    
+    // 2単語以上のループパターン検出（例: A B A B）
+    if (result.length >= 2 && i < tokens.length - 1) {
+      const prevTwo = result.slice(-2).join(' ');
+      const nextTwo = [tokens[i], tokens[i + 1]].join(' ');
+      if (prevTwo === nextTwo) {
+        break; // ループ検出時点で生成終了
+      }
+    }
+    
+    result.push(currentToken);
+  }
+  return result;
+}
+
 // 2. 推論・対話処理
 function handleGenerate() {
   const prompt = seedInput.value.trim();
@@ -110,9 +144,9 @@ function handleGenerate() {
 
   let currentPromptTokens = prompt.split(/\s+/).filter(Boolean);
   let generatedTokens = [...currentPromptTokens];
-  const generateLength = 15;
+  const generateLength = 30; // 内部生成ステップ数
 
-  // 非同期で生成（思考中表示を一瞬見せるため）
+  // 非同期で生成
   setTimeout(() => {
     for (let step = 0; step < generateLength; step++) {
       let inputSubTokens = generatedTokens.slice(-sequenceLength);
@@ -150,20 +184,30 @@ function handleGenerate() {
         rawOutputs[outIdx] = sum;
       }
 
-      let bestCharId = 0;
-      let highestScore = -Infinity;
-      for (let outIdx = 0; outIdx < vocabSize; outIdx++) {
-        if (rawOutputs[outIdx] > highestScore) {
-          highestScore = rawOutputs[outIdx];
-          bestCharId = outIdx;
-        }
+      // 出力スコア順にインデックスをソート
+      const sortedIndices = Array.from({ length: vocabSize }, (_, k) => k)
+        .sort((a, b) => rawOutputs[b] - rawOutputs[a]);
+
+      let bestCharId = sortedIndices[0];
+      const lastToken = generatedTokens[generatedTokens.length - 1];
+
+      // 直前の単語と同じ単語が出力されそうな場合、次の高スコア単語を選択して重複を防止
+      if (idToChar[bestCharId] === lastToken && sortedIndices.length > 1) {
+        bestCharId = sortedIndices[1];
       }
 
       const predictedChar = idToChar[bestCharId] || '';
       generatedTokens.push(predictedChar);
     }
 
-    const generatedResult = generatedTokens.join(' ');
+    // 同じ単語・フレーズの繰り返しを削除
+    const filteredTokens = removeDuplicatePhrases(generatedTokens);
+    let generatedResult = filteredTokens.join(' ');
+
+    // 文字数制限の適用 (MAX_CHAR_LIMIT 文字を超えた場合は切り捨て)
+    if (generatedResult.length > MAX_CHAR_LIMIT) {
+      generatedResult = generatedResult.substring(0, MAX_CHAR_LIMIT);
+    }
 
     // タイピングアニメーション開始
     aiMessageContainer.innerHTML = '';
