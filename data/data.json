@@ -1,0 +1,12 @@
+{
+  "system_info": {
+    "version": "1.0.0",
+    "description": "senninai Neo 学習データ設定ファイル"
+  },
+  "default_params": {
+    "sequenceLength": 3,
+    "hiddenUnits": 64,
+    "learningRate": 0.05,
+    "totalEpochs": 300
+  }
+}
