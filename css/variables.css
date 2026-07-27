@@ -1,0 +1,11 @@
+:root {
+  --bg-primary: #171717;
+  --bg-secondary: #212121;
+  --bg-tertiary: #2f2f2f;
+  --accent-color: #10a37f;
+  --accent-hover: #1a7f64;
+  --text-main: #ececec;
+  --text-muted: #8e8e93;
+  --border-color: #303030;
+  --sidebar-width: 280px;
+}
