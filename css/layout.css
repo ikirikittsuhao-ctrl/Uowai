@@ -1,0 +1,202 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-secondary);
+  color: var(--text-main);
+  display: flex;
+  height: 100vh;
+  height: 100dvh; /* スマホブラウザのアドレスバー考慮 */
+  overflow: hidden;
+}
+
+/* ----------------------------------
+   サイドバー (ドロワー対応)
+---------------------------------- */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
+  z-index: 100;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+.sidebar-header .title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.close-sidebar-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: none; /* スマホ時のみ表示 */
+  align-items: center;
+  justify-content: center;
+}
+
+.dataset-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dataset-container label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dataset-input {
+  width: 100%;
+  height: 200px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-main);
+  padding: 12px;
+  font-size: 0.85rem;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+.dataset-input:focus {
+  border-color: var(--accent-color);
+}
+
+/* ----------------------------------
+   メインコンテンツ (縦積み固定用)
+---------------------------------- */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  position: relative;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.chat-header {
+  height: 56px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-main);
+  gap: 12px;
+  flex-shrink: 0; /* ヘッダーの高さを固定 */
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  display: none; /* スマホ時のみ表示 */
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.menu-toggle-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+/* チャット履歴 (ここだけ可変スクロール) */
+.chat-history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+/* ----------------------------------
+   入力フォームエリア (最下部固定)
+---------------------------------- */
+.input-container {
+  padding: 12px 20% 24px;
+  background-color: var(--bg-secondary);
+  flex-shrink: 0; /* 入力エリアの高さを保ち、つぶれないようにする */
+  width: 100%;
+}
+
+/* ----------------------------------
+   レスポンシブデザイン (スマホ対応)
+---------------------------------- */
+@media (max-width: 900px) {
+  .menu-toggle-btn, .close-sidebar-btn {
+    display: flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .message-row {
+    padding: 16px 5%;
+  }
+
+  .input-container {
+    padding: 8px 4% 16px;
+  }
+}
