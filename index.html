@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+  <title>ChatGPT Neo - 超軽量自作AI</title>
+  
+  <!-- Material Symbols & Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- 分割したCSSファイル群 -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- オーバーレイ（スマホサイドバー開閉用） -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- サイドバー（設定・学習用） -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="title-group">
+        <span class="material-symbols-outlined" style="color: var(--accent-color);">neurology</span>
+        <span>AIモデル構築</span>
+      </div>
+      <button class="close-sidebar-btn" id="closeSidebarBtn">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="dataset-container">
+      <label for="textInput">
+        <span class="material-symbols-outlined" style="font-size: 1rem;">dataset</span>
+        学習テキスト（ナレッジ）
+      </label>
+      <textarea id="textInput" class="dataset-input" placeholder="デフォルトで文章はなし。/data/gakusyuu1.json の内容が自動読み込みされます。"></textarea>
+
+      <button id="trainBtn" class="btn-train">
+        <span class="material-symbols-outlined" id="trainIcon">auto_awesome</span>
+        <span id="trainBtnText">学習を開始する</span>
+      </button>
+    </div>
+
+    <div class="status-badge" id="statusText">状態: 未学習</div>
+  </div>
+
+  <!-- メインチャット画面 -->
+  <div class="main-content">
+    <div class="chat-header">
+      <button class="menu-toggle-btn" id="menuToggleBtn">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <span>ChatGPT Neo (自作軽量モデル)</span>
+    </div>
+    
+    <div class="chat-history" id="chatHistory">
+      <div class="message-row assistant">
+        <div class="avatar assistant">
+          <span class="material-symbols-outlined" style="font-size: 1.2rem;">smart_toy</span>
+        </div>
+        <div class="message-content">こんにちは！左パネル（またはメニュー）から学習を開始してください。学習データに基づいて文章の続きを生成します。</div>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-box">
+        <input type="text" id="seedInput" class="chat-input" placeholder="続きの言葉を入力（例: にゃん）..." disabled />
+        <button id="generateBtn" class="send-btn" disabled>
+          <span class="material-symbols-outlined" style="font-size: 1.2rem;">send</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS スクリプトの読み込み -->
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
